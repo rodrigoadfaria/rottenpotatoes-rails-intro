@@ -15,8 +15,8 @@ Rails.application.routes.draw do
   #   resources :products
 
   resources :movies
-  get "/movies/by_title" => "movies#index"
-  get '/movies/by_date' => 'movies#index'
+  #get "/movies/by_title" => "movies#index"
+  #get '/movies/by_date' => 'movies#index'
     
   
 

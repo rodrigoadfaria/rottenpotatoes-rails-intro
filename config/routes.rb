@@ -14,13 +14,9 @@ Rails.application.routes.draw do
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
 
-  resources :movies #, :new => { :order => :GET }
-  
-    #get 'movies/by_title'
-    get 'by_title' => 'movies#by_title'
-  
-    #get 'movies/by_date'
-    get 'by_date' => 'movies#by_date'
+  resources :movies
+  get "/movies/by_title" => "movies#index"
+  get '/movies/by_date' => 'movies#index'
     
   
 

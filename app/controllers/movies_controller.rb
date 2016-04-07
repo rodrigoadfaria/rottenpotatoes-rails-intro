@@ -21,14 +21,17 @@ class MoviesController < ApplicationController
       @selected_ratings = Movie.ratings
     end
     
-    @movies = Movie.where(rating: @selected_ratings)
-    
     if params[:sort] == "title"
-      @movies= Movie.order(:title)
+      order = :title
       @class_title_hilite = "hilite"
     elsif params[:sort] == "date" 
-      @movies= Movie.order(:release_date)
+      order = :release_date
       @class_date_hilite = "hilite"
+    end
+    
+    @movies = Movie.where(rating: @selected_ratings)
+    if order
+      @movies = Movie.where(rating: @selected_ratings).order(order)
     end
   end
 

@@ -30,7 +30,7 @@ class MoviesController < ApplicationController
     end
     
     @movies = Movie.where(rating: @selected_ratings)
-    if order
+    if order != nil
       @movies = Movie.where(rating: @selected_ratings).order(order)
     end
   end

@@ -45,13 +45,13 @@ class MoviesController < ApplicationController
     @selected_ratings = session[:selected_ratings]
     if @selected_ratings == nil # we have a new session
       @selected_ratings = Movie.ratings
-    else
-      user_ratings = params[:ratings]
-      if user_ratings != nil
-        user_ratings = user_ratings.keys
-        user_ratings.map { |x| x.to_s }
-        @selected_ratings = user_ratings
-      end
+    end
+
+    user_ratings = params[:ratings]
+    if user_ratings != nil
+      user_ratings = user_ratings.keys
+      user_ratings.map { |x| x.to_s }
+      @selected_ratings = user_ratings
     end
     
     session[:selected_ratings] = @selected_ratings

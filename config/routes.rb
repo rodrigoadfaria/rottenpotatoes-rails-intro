@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   #   resources :products
 
   resources :movies
+  
+  get 'movies_by_rating', :to => 'movies#by_rating'
+  get 'movies_reordered', :to => 'movies#reordered'
 
   # Example resource route with options:
   #   resources :products do

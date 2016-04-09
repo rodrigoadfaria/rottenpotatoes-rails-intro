@@ -11,8 +11,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @all_ratings = Movie.ratings
-    
     @selected_ratings = session[:selected_ratings]
     if @selected_ratings == nil # we have a new session
       @selected_ratings = Movie.ratings
@@ -26,18 +24,30 @@ class MoviesController < ApplicationController
     end
     
     session[:selected_ratings] = @selected_ratings
-    
+
+    order = session[:order]
+    class_date_hilite = session[:class_date_hilite]
+    class_title_hilite = session[:class_title_hilite]
     if params[:sort] == "title"
       order = :title
-      @class_title_hilite = "hilite"
+      class_title_hilite = "hilite"
+      class_date_hilite = 'none'
     elsif params[:sort] == "date" 
       order = :release_date
-      @class_date_hilite = "hilite"
+      class_date_hilite = "hilite"
+      class_title_hilite = 'none'
     end
     
-    @movies = Movie.where(rating: @selected_ratings)
-    if order != nil
-      @movies = Movie.where(rating: @selected_ratings).order(order)
+    session[:order] = order
+    session[:class_date_hilite] = class_date_hilite
+    session[:class_title_hilite] = class_title_hilite
+    
+    if params[:ratings] != nil
+      redirect_to movies_by_rating_path
+    elsif params[:sort] != nil
+      redirect_to movies_reordered_path
+    else
+      retrieve_page_data
     end
   end
 
@@ -62,6 +72,30 @@ class MoviesController < ApplicationController
     redirect_to movie_path(@movie)
   end
 
+  def by_rating
+    retrieve_page_data
+    render 'index'
+  end
+  
+  def reordered
+    retrieve_page_data
+    render 'index'
+  end
+  
+  def retrieve_page_data
+    @all_ratings = Movie.ratings
+    @selected_ratings = session[:selected_ratings]
+    @class_title_hilite = session[:class_title_hilite]
+    @class_date_hilite = session[:class_date_hilite]
+    
+    order = session[:order]
+    if order != nil
+      @movies = Movie.where(rating: @selected_ratings).order(order)
+    else
+      @movies = Movie.where(rating: @selected_ratings)
+    end
+  end
+  
   def destroy
     @movie = Movie.find(params[:id])
     @movie.destroy

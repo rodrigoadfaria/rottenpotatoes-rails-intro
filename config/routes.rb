@@ -13,19 +13,8 @@ Rails.application.routes.draw do
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
-
-  #resources :movies
   
-  #get 'movies_by_rating', :to => 'movies#by_rating'
-  #get 'movies_reordered', :to => 'movies#reordered'
-  resources :movies do
-    collection do
-      get :by_rating
-      get :reordered
-    end
-  # url: /comentarios/feed
-  # named_route: feed_comentarios_path
-  end  
+  resources :movies  
 
   # Example resource route with options:
   #   resources :products do

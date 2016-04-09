@@ -1,5 +1,10 @@
 class MoviesController < ApplicationController
-
+  
+  def initialize
+    @all_ratings = Movie.ratings
+    super
+  end
+  
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date, :ratings)
   end
@@ -11,13 +16,50 @@ class MoviesController < ApplicationController
   end
 
   def index
-    if params[:ratings] != nil
-      redirect_to by_rating_movies_path(ratings: params[:ratings])
-    elsif params[:sort] != nil
-      redirect_to reordered_movies_path(sort: params[:sort])
+    to_b_redirected = false
+
+    user_ratings = params[:ratings]
+    if user_ratings != nil
+      if user_ratings.is_a?(Hash)
+        user_ratings = user_ratings.keys
+        user_ratings.map { |x| x.to_s }
+      end
+      @selected_ratings = user_ratings
+      
+    elsif session[:selected_ratings]
+      @selected_ratings = session[:selected_ratings]
+      to_b_redirected = true
     else
-      retrieve_page_data
+      @selected_ratings = @all_ratings
+      to_b_redirected = true
     end
+    
+    if params[:sort]
+      @order = params[:sort]
+    elsif
+      @order = session[:order]
+      to_b_redirected = true
+    end
+    
+    if to_b_redirected
+      redirect_to movies_path(:sort => @order, :ratings => @selected_ratings)
+    end
+
+    @movies = Movie.where(rating: @selected_ratings)
+    if @order != nil
+      if @order == 'title'
+        @class_title = 'hilite'
+        @class_date = 'none' 
+      else
+        @class_title = 'none'
+        @class_date = 'hilite' 
+      end
+      
+      @movies = Movie.where(rating: @selected_ratings).order(@order)
+    end
+    
+    session[:selected_ratings] = @selected_ratings
+    session[:order] = @order
   end
 
   def new
@@ -39,61 +81,6 @@ class MoviesController < ApplicationController
     @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
     redirect_to movie_path(@movie)
-  end
-
-  def by_rating
-    @selected_ratings = session[:selected_ratings]
-    if @selected_ratings == nil # we have a new session
-      @selected_ratings = Movie.ratings
-    end
-
-    user_ratings = params[:ratings]
-    if user_ratings != nil
-      user_ratings = user_ratings.keys
-      user_ratings.map { |x| x.to_s }
-      @selected_ratings = user_ratings
-    end
-    
-    session[:selected_ratings] = @selected_ratings
-    
-    retrieve_page_data
-    render 'index'
-  end
-  
-  def reordered
-    order = session[:order]
-    class_date_hilite = session[:class_date_hilite]
-    class_title_hilite = session[:class_title_hilite]
-    if params[:sort] == "title"
-      order = :title
-      class_title_hilite = "hilite"
-      class_date_hilite = 'none'
-    elsif params[:sort] == "date" 
-      order = :release_date
-      class_date_hilite = "hilite"
-      class_title_hilite = 'none'
-    end
-    
-    session[:order] = order
-    session[:class_date_hilite] = class_date_hilite
-    session[:class_title_hilite] = class_title_hilite
-    
-    retrieve_page_data
-    render 'index'
-  end
-  
-  def retrieve_page_data
-    @all_ratings = Movie.ratings
-    @selected_ratings = session[:selected_ratings] == nil ? @all_ratings : session[:selected_ratings]
-    @class_title_hilite = session[:class_title_hilite] == nil ? 'none' : session[:class_title_hilite]
-    @class_date_hilite = session[:class_date_hilite] == nil ? 'none' : session[:class_date_hilite]
-    
-    order = session[:order]
-    if order != nil
-      @movies = Movie.where(rating: @selected_ratings).order(order)
-    else
-      @movies = Movie.where(rating: @selected_ratings)
-    end
   end
   
   def destroy

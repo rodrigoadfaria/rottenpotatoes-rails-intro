@@ -11,44 +11,7 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @selected_ratings = session[:selected_ratings]
-    if @selected_ratings == nil # we have a new session
-      @selected_ratings = Movie.ratings
-    else
-      user_ratings = params[:ratings]
-      if user_ratings != nil
-        user_ratings = user_ratings.keys
-        user_ratings.map { |x| x.to_s }
-        @selected_ratings = user_ratings
-      end
-    end
-    
-    session[:selected_ratings] = @selected_ratings
-
-    order = session[:order]
-    class_date_hilite = session[:class_date_hilite]
-    class_title_hilite = session[:class_title_hilite]
-    if params[:sort] == "title"
-      order = :title
-      class_title_hilite = "hilite"
-      class_date_hilite = 'none'
-    elsif params[:sort] == "date" 
-      order = :release_date
-      class_date_hilite = "hilite"
-      class_title_hilite = 'none'
-    end
-    
-    session[:order] = order
-    session[:class_date_hilite] = class_date_hilite
-    session[:class_title_hilite] = class_title_hilite
-    
-    if params[:ratings] != nil
-      redirect_to movies_by_rating_path
-    elsif params[:sort] != nil
-      redirect_to movies_reordered_path
-    else
-      retrieve_page_data
-    end
+    retrieve_page_data
   end
 
   def new
@@ -73,20 +36,51 @@ class MoviesController < ApplicationController
   end
 
   def by_rating
+    @selected_ratings = session[:selected_ratings]
+    if @selected_ratings == nil # we have a new session
+      @selected_ratings = Movie.ratings
+    else
+      user_ratings = params[:ratings]
+      if user_ratings != nil
+        user_ratings = user_ratings.keys
+        user_ratings.map { |x| x.to_s }
+        @selected_ratings = user_ratings
+      end
+    end
+    
+    session[:selected_ratings] = @selected_ratings
+    
     retrieve_page_data
     render 'index'
   end
   
   def reordered
+    order = session[:order]
+    class_date_hilite = session[:class_date_hilite]
+    class_title_hilite = session[:class_title_hilite]
+    if params[:sort] == "title"
+      order = :title
+      class_title_hilite = "hilite"
+      class_date_hilite = 'none'
+    elsif params[:sort] == "date" 
+      order = :release_date
+      class_date_hilite = "hilite"
+      class_title_hilite = 'none'
+    end
+    
+    session[:order] = order
+    session[:class_date_hilite] = class_date_hilite
+    session[:class_title_hilite] = class_title_hilite
+    
     retrieve_page_data
     render 'index'
   end
   
   def retrieve_page_data
     @all_ratings = Movie.ratings
-    @selected_ratings = session[:selected_ratings]
-    @class_title_hilite = session[:class_title_hilite]
-    @class_date_hilite = session[:class_date_hilite]
+    @selected_ratings = session[:selected_ratings] == nil ? @all_ratings : session[:selected_ratings]
+    @class_title_hilite = session[:class_title_hilite] == nil ? 'none' : session[:class_title_hilite]
+    @class_date_hilite = session[:class_date_hilite] == nil ? 'none' : session[:class_date_hilite]
     
     order = session[:order]
     if order != nil

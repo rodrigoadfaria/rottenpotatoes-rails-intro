@@ -13,13 +13,19 @@ class MoviesController < ApplicationController
   def index
     @all_ratings = Movie.ratings
     
-    @selected_ratings = params[:ratings]
-    if @selected_ratings != nil
-      @selected_ratings = @selected_ratings.keys
-      @selected_ratings.map { |x| x.to_s }
-    else
+    @selected_ratings = session[:selected_ratings]
+    if @selected_ratings == nil # we have a new session
       @selected_ratings = Movie.ratings
+    else
+      user_ratings = params[:ratings]
+      if user_ratings != nil
+        user_ratings = user_ratings.keys
+        user_ratings.map { |x| x.to_s }
+        @selected_ratings = user_ratings
+      end
     end
+    
+    session[:selected_ratings] = @selected_ratings
     
     if params[:sort] == "title"
       order = :title

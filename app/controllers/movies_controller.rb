@@ -11,7 +11,13 @@ class MoviesController < ApplicationController
   end
 
   def index
-    retrieve_page_data
+    if params[:ratings] != nil
+      redirect_to by_rating_movies_path(ratings: params[:ratings])
+    elsif params[:sort] != nil
+      redirect_to reordered_movies_path(sort: params[:sort])
+    else
+      retrieve_page_data
+    end
   end
 
   def new

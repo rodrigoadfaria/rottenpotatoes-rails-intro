@@ -89,4 +89,9 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
+  
+  def to_json
+    @movie = Movie.find(params[:id])
+    render :json => @movie
+  end
 end
